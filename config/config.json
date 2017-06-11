@@ -1,0 +1,13 @@
+{
+	"port": 3000,
+	"mongoose": {
+		"uri": "mongodb://root:zxc123@localhost:27017/chat",
+		"options": {
+			"server": {
+				"socketOptions": {
+					"keepAlive": 1
+				}
+			}
+		}
+	}
+}
