@@ -9,6 +9,9 @@ const bodyParser = require('body-parser');
 const cookieParser = require('cookie-parser');
 const favicon = require('serve-favicon');
 const HttpError = require('error').HttpError;
+const mongoose = require('./libs/mongoose');
+const session = require('express-session');
+const cookieSession = require('cookie-session');
 const index = require('./routes/index');
 
 const app = express();
@@ -39,6 +42,27 @@ app.use(bodyParser.urlencoded({extended: false}));
 
 app.use(cookieParser());
 
+const MongoStore = require('connect-mongo')(session);
+//
+app.use(session({
+	secret: config.get('session:secret'),
+	key: config.get('session:key'),
+	cookie: config.get('session:cookie'),
+	resave: true,
+	saveUninitialized: true,
+	store: new MongoStore({
+		mongooseConnection: mongoose.connection,
+		collection: 'sessions',
+	})
+}));
+
+
+app.use((req, res, next) => {
+	req.session.numberOfVisits = ++req.session.numberOfVisits || 1;
+	res.send('Visits: ' + req.session.numberOfVisits);
+})
+
+
 app.use(require('middleware/sendHttpError'));
 
 // Router
@@ -50,15 +74,11 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 // Error middleware
 app.use((err, req, res, next) => {
-	console.log('HERE');
-
 	if (typeof err == 'number') { // next(404)
-		console.log(' == { // next(404)');
 		err = new HttpError(err);
 	}
 
 	if (err instanceof HttpError) {
-		console.log(' instanceOf httpErr');
 		res.sendHttpError(err);
 	} else {
 		if (app.get('env') === 'development') {
