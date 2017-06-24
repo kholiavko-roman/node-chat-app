@@ -1,0 +1,10 @@
+<% layout('layout/page') -%>
+<% block('title', 'Чат'); -%>
+
+
+<p>чат...</p>
+
+<% if(user) { %>
+<p>Privet, <%=user.get('username')%></p>
+<% } %>
+

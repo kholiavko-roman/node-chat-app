@@ -57,13 +57,14 @@ app.use(session({
 }));
 
 
-app.use((req, res, next) => {
-	req.session.numberOfVisits = ++req.session.numberOfVisits || 1;
-	res.send('Visits: ' + req.session.numberOfVisits);
-})
+//app.use((req, res, next) => {
+//	req.session.numberOfVisits = ++req.session.numberOfVisits || 1;
+//	res.send('Visits: ' + req.session.numberOfVisits);
+//})
 
 
 app.use(require('middleware/sendHttpError'));
+app.use(require('middleware/loadUser'));
 
 // Router
 app.use('/', index);

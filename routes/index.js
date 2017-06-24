@@ -2,14 +2,10 @@ const express = require('express');
 const router = express.Router();
 const User = require('models/user').User;
 const HttpError = require('error').HttpError;
+const checkAuth = require('middleware/checkAuth');
 
 // Show homepage
-router.get('/', (req, res, next) => {
-  res.render('index', {
-		title: 'Express',
-		heading2: '<h2>heading 2</h2>'
-	});
-});
+router.get('/', require('./frontpage').get);
 
 // Show all users
 router.get('/users', (req, res, next) => {
@@ -33,5 +29,15 @@ router.get('/user/:id', (req, res, next) => {
 		res.json(user);
 	});
 });
+
+// Show Login page
+router.get('/login', require('./login').get);
+router.post('/login', require('./login').post);
+
+// Logout
+router.post('/logout', require('./logout').post);
+
+// Show chat page
+router.get('/chat', checkAuth, require('./chat').get);
 
 module.exports = router;
