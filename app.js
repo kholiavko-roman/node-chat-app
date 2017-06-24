@@ -95,25 +95,18 @@ app.use((err, req, res, next) => {
 });
 
 
-//
-//// catch 404 and forward to error handler
-//app.use(function(req, res, next) {
-//  var err = new Error('Not Found');
-//  err.status = 404;
-//  next(err);
-//});
-//
-//// error handler
-//app.use(function(err, req, res, next) {
-//  // set locals, only providing error in development
-//  res.locals.message = err.message;
-//  res.locals.error = req.app.get('env') === 'development' ? err : {};
-//
-//  // render the error page
-//  res.status(err.status || 500);
-//  res.render('error');
-//});
+const server = http.createServer(app)
+const io = require('socket.io')(server);
 
-http.createServer(app).listen(config.get('port'), () => {
+io.on('connection', function (socket) {
+
+	socket.on('message', function (message, callback) {
+		socket.broadcast.emit('message', message);
+		callback(message);
+	})
+});
+
+server.listen(config.get('port'), () => {
 	log.info('Express server listening on port ' + config.get('port'));
 });
+

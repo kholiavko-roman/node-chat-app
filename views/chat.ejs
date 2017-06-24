@@ -1,10 +1,46 @@
 <% layout('layout/page') -%>
 <% block('title', 'Чат'); -%>
-
-
-<p>чат...</p>
-
 <% if(user) { %>
-<p>Privet, <%=user.get('username')%></p>
+<p>Privet, <%= user.get('username') %></p>
 <% } %>
 
+<script src="/socket.io/socket.io.js"></script>
+
+<div id="room">
+  <ul></ul>
+
+  <form action="">
+    <input type="text" autofocus placeholder="Your message">
+  </form>
+</div>
+
+
+<script>
+  $(function () {
+    var socket = io(),
+        form = $('#room form'),
+        ul = $('#room ul');
+
+    form.submit(function () {
+      var input = $(this).find('input'),
+          message = input.val();
+
+      console.log(message);
+
+      input.val('');
+
+      socket.emit('message', message, function (data) {
+        var listEl = '<li>' + data + '</li>';
+        $(listEl).appendTo(ul);
+      });
+
+
+      return false;
+    });
+
+    socket.on('message', function (message) {
+      var listEl = '<li>' + message + '</li>';
+      $(listEl).appendTo(ul);
+    })
+  });
+</script>
